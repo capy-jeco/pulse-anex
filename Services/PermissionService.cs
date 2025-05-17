@@ -1,65 +1,123 @@
 ﻿using System.Security.Claims;
+using AutoMapper;
 using portal_agile.Contracts.Repositories;
 using portal_agile.Contracts.Services;
+using portal_agile.Dtos.Permissions;
+using portal_agile.Exceptions.Users;
+using portal_agile.Repositories;
 using portal_agile.Security;
 
 namespace portal_agile.Services
 {
-    public class PermissionService(IPermissionRepository permissionRepository) : IPermissionService
+    public class PermissionService : IPermissionService
     {
-        private readonly IPermissionRepository _permissionRepository = permissionRepository;
+        private readonly IPermissionRepository _permissionRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        /// <inheritdoc/>
-        public async Task<List<Permission>> GetAllPermissionsAsync()
+        public PermissionService(
+            IPermissionRepository permissionRepository,
+            IUserRepository userRepository,
+            IMapper mapper)
         {
-            return (List<Permission>)await _permissionRepository.GetAllPermissions();
-        }
-
-        public async Task<Permission> GetPermissionByIdAsync(int permissionId)
-        {
-            return await _permissionRepository.GetPermissionById(permissionId);
-        }
-
-        /// <inheritdoc/>
-        public Task<List<Permission>> GetAllUserPermissionsAsync(string userId)
-        {
-            return _permissionRepository.GetAllUserPermissions(userId);
+            _permissionRepository = permissionRepository;
+            _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         /// <inheritdoc/>
-        public Task<Dictionary<string, List<Permission>>> GetPermissionsByModuleAsync()
+        public async Task<List<PermissionDto>> GetAllPermissionsAsync()
         {
-            return _permissionRepository.GetPermissionsByModule();
+            var permissions = await _permissionRepository.GetAll();
+
+            if (permissions == null || !permissions.Any())
+            {
+                return new List<PermissionDto>();
+            }
+
+            return _mapper.Map<List<PermissionDto>>(permissions);
+        }
+
+        public async Task<PermissionDto> GetPermissionByIdAsync(int permissionId)
+        {
+            var permission = await _permissionRepository.GetById(permissionId);
+
+            return _mapper.Map<PermissionDto>(permission);
         }
 
         /// <inheritdoc/>
-        public async Task<List<Permission>> GetRolePermissionsAsync(string roleId)
+        public async Task<Dictionary<string, List<PermissionDto>>> GetAllPermissionsByModuleAsync()
         {
-            return await _permissionRepository.GetRolePermissions(roleId);
+            var permissions = await _permissionRepository.GetAllPermissionsByModule();
+            if (permissions == null)
+            {
+                return new Dictionary<string, List<PermissionDto>>();
+            }
+
+            return _mapper.Map<Dictionary<string, List<PermissionDto>>>(permissions);
         }
 
         /// <inheritdoc/>
-        public async Task<List<Permission>> GetUserDirectPermissionsAsync(string userId)
+        public async Task<List<PermissionDto>> GetRolePermissionsAsync(string roleId)
         {
-            return await (_permissionRepository.GetUserDirectPermissions(userId));
+            var permissions = await _permissionRepository.GetRolePermissions(roleId);
+            return _mapper.Map<List<PermissionDto>>(permissions);
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<PermissionDto>> GetUserDirectPermissionsAsync(string userId)
+        {
+            var permissions = await _permissionRepository.GetUserDirectPermissions(userId);
+            return _mapper.Map<List<PermissionDto>>(permissions);
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<PermissionDto>> GetAllUserPermissionsAsync(string userId)
+        {
+            var permissions = await _permissionRepository.GetAllUserPermissions(userId);
+            return _mapper.Map<List<PermissionDto>>(permissions);
         }
 
         /// <inheritdoc/>
         public async Task<IList<Claim>> GetUserPermissionClaimsAsync(string userId)
         {
-            return await _permissionRepository.GetUserPermissionClaims(userId);
+            var user = await _userRepository.GetById(userId);
+            if (user == null)
+            {
+                throw new UserNotFoundException(userId);
+            }
+
+            var permissionClaims = await _permissionRepository.GetUserPermissionClaims(userId);
+            if (permissionClaims == null || !permissionClaims.Any())
+            {
+                return new List<Claim>();
+            }
+
+            return permissionClaims;
         }
 
         /// <inheritdoc/>
-        public async Task<Permission> Store(Permission permission)
+        public async Task<PermissionDto> CreateAsync(PermissionCreateDto permissionCreateDto)
         {
-            return await _permissionRepository.Store(permission);
+            var createdPermission = await _permissionRepository.Create(_mapper.Map<Permission>(permissionCreateDto));
+            var permissionDto = _mapper.Map<PermissionDto>(createdPermission);
+
+            return permissionDto;
         }
 
         /// <inheritdoc/>
-        public async Task<bool> AssignDirectPermissionsToUserAsync(string userId, IEnumerable<int> permissionIds, string modifiedBy)
+        public async Task<PermissionDto> UpdatePermissionAsync(Permission permissionUpdate)
         {
-            return await _permissionRepository.AssignDirectPermissionsToUser(userId, permissionIds, modifiedBy);
+            var permission = await _permissionRepository.GetById(permissionUpdate.PermissionId);
+            if (permission == null)
+            {
+                throw new Exception("Role not found");
+            }
+
+            _permissionRepository.Update(permission);
+            await _permissionRepository.SaveChangesAsync();
+
+            return _mapper.Map<PermissionDto>(permission);
         }
 
         /// <inheritdoc/>
@@ -69,9 +127,51 @@ namespace portal_agile.Services
         }
 
         /// <inheritdoc/>
+        public async Task<bool> AssignDirectPermissionsToUserAsync(string userId, IEnumerable<int> permissionIds, string modifiedBy)
+        {
+            var user = await _userRepository.GetById(userId);
+            if (user == null)
+            {
+                throw new UserNotFoundException(userId);
+            }
+            var permissionsAreAssigned = await _permissionRepository.AssignDirectPermissionsToUser(userId, permissionIds, modifiedBy);
+
+            return permissionsAreAssigned;
+        }
+
+        public async Task<bool> AssignPermissionToUserAsync(string userId, int permissionId, string modifiedBy)
+        {
+            var user = await _userRepository.GetById(userId);
+            if (user == null)
+            {
+                throw new UserNotFoundException(userId);
+            }
+
+            var permission = await _permissionRepository.GetById(permissionId);
+            if (permission == null)
+            {
+                throw new Exception("Permission not found");
+            }
+
+            var permissionsAreAssigned = await _permissionRepository.AssignPermissionToUser(userId, permissionId, modifiedBy);
+
+            return permissionsAreAssigned;
+        }
+
+        /// <inheritdoc/>
         public async Task<bool> HasPermissionAsync(string userId, string permissionCode)
         {
             return await _permissionRepository.HasPermission(userId, permissionCode);
+        }
+
+        public async Task RemovePermissionsFromUser(string userId, List<int> permissionIds)
+        {
+            var user = await _userRepository.GetById(userId);
+            if (user == null)
+            {
+                throw new UserNotFoundException(userId);
+            }
+            await _permissionRepository.RemovePermissionsFromUser(userId, permissionIds);
         }
 
         /// <inheritdoc/>

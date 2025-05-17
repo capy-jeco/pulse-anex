@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using portal_agile.Contracts.Repositories;
@@ -9,35 +10,29 @@ using portal_agile.Security;
 
 namespace portal_agile.Repositories
 {
-    public class PermissionRepository : BaseRepository<Permission, AppDbContext>, IPermissionRepository
+    public class PermissionRepository : BaseRepository<Permission, int, AppDbContext>, IPermissionRepository
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
 
+        private readonly IRoleRepository _roleRepository;
+
         public PermissionRepository(
             AppDbContext context,
             UserManager<User> userManager,
-            RoleManager<Role> roleManager)
+            RoleManager<Role> roleManager,
+            IRoleRepository roleRepository)
             : base(context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-        }
-
-        /// <inheritdoc/>
-        public async Task<IEnumerable<Permission>> GetAllPermissions()
-        {
-            return await _context.Permissions
-                .Where(p => p.IsActive)
-                .OrderBy(p => p.Module)
-                .ThenBy(p => p.Name)
-                .ToListAsync();
+            _roleRepository = roleRepository;
         }
 
         /// <inheritdoc/>
         public async Task<IEnumerable<Permission>> GetPermissionsByRoleId(string roleId)
         {
-            var role = await _roleManager.FindByIdAsync(roleId);
+            var role = await _roleRepository.GetRoleById(roleId);
             if (role == null)
             {
                 throw new ArgumentException($"Role with ID {roleId} not found.");
@@ -50,10 +45,12 @@ namespace portal_agile.Repositories
             return permissions;
         }
 
+        /// <inheritdoc/>
         public async Task<Permission> GetPermissionById(int permissionId)
         {
             var permission = await _context.Permissions
                 .FirstOrDefaultAsync(p => p.PermissionId == permissionId);
+
             if (permission == null)
             {
                 throw new ArgumentException($"Permission with ID {permissionId} not found.");
@@ -61,15 +58,35 @@ namespace portal_agile.Repositories
             return permission;
         }
 
-        public async Task<Dictionary<string, List<Permission>>> GetPermissionsByModule()
+        /// <inheritdoc/>
+        public async Task<Dictionary<string, List<Permission>>> GetAllPermissionsByModule()
         {
-            var permissions = await GetAllPermissions();
-            return permissions.GroupBy(p => p.Module).ToDictionary(g => g.Key, g => g.ToList());
+            IQueryable<Permission> query = _context.Permissions;
+
+            var permissions = await query
+                .Select(p => new Permission
+                {
+                    PermissionId = p.PermissionId,
+                    Name = p.Name,
+                    Code = p.Code,
+                    Description = p.Description,
+                    Module = p.Module,
+                })
+                .AsNoTracking() // Better performance for read-only operations
+                .ToListAsync();
+
+            return permissions
+                .GroupBy(p => p.Module)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.ToList()
+                );
         }
 
+        /// <inheritdoc/>
         public async Task<List<Permission>> GetRolePermissions(string roleId)
         {
-            var role = await _roleManager.FindByIdAsync(roleId);
+            var role = await _roleRepository.GetRoleById(roleId);
             if (role == null)
             {
                 throw new ArgumentException($"Role with ID {roleId} not found.");
@@ -85,6 +102,7 @@ namespace portal_agile.Repositories
             return permissions;
         }
 
+        /// <inheritdoc/>
         public async Task<List<Permission>> GetUserDirectPermissions(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -101,6 +119,7 @@ namespace portal_agile.Repositories
             return permissions;
         }
 
+        /// <inheritdoc/>
         public async Task<List<Permission>> GetAllUserPermissions(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -116,7 +135,7 @@ namespace portal_agile.Repositories
             var rolePermissions = new List<Permission>();
             foreach (var roleName in userRoles)
             {
-                var role = await _roleManager.FindByNameAsync(roleName);
+                var role = await _roleRepository.GetRoleByName(roleName);
                 if (role != null)
                 {
                     var permissions = await GetRolePermissions(role.Id);
@@ -132,15 +151,19 @@ namespace portal_agile.Repositories
                 .ToList();
         }
 
-        public async Task<Permission> Store(Permission permission)
+        /// <inheritdoc/>
+        public async Task<IList<Claim>> GetUserPermissionClaims(string userId)
         {
-            return await base.Create(permission);
+            var permissions = await GetAllUserPermissions(userId);
+            return permissions
+                .Select(p => new Claim("Permission", p.Code))
+                .ToList();
         }
 
-
+        /// <inheritdoc/>
         public async Task<bool> AssignPermissionsToRole(string roleId, IEnumerable<int> permissionIds, string modifiedBy)
         {
-            var role = await _roleManager.FindByIdAsync(roleId);
+            var role = await _roleRepository.GetRoleById(roleId);
             if (role == null)
                 return false;
 
@@ -150,14 +173,14 @@ namespace portal_agile.Repositories
                 // For SuperAdmin, we ensure it always has ALL permissions
                 if (role.Name == "SuperAdmin")
                 {
-                    var allPermissions = await GetAllPermissions();
+                    var allPermissions = await GetAll();
                     permissionIds = allPermissions.Select(p => p.PermissionId);
                 }
 
                 // For Admin, ensure it has all but system admin permissions
                 if (role.Name == "Admin")
                 {
-                    var allPermissions = await GetAllPermissions();
+                    var allPermissions = await GetAll();
                     // Filter out system admin permissions if they're not explicitly included
                     var systemPermissions = allPermissions.Where(p => p.Module == "SystemAdministration").Select(p => p.PermissionId);
                     var adminPermissions = allPermissions.Where(p => p.Module != "SystemAdministration").Select(p => p.PermissionId);
@@ -203,6 +226,7 @@ namespace portal_agile.Repositories
             }
         }
 
+        /// <inheritdoc/>
         public async Task<bool> AssignDirectPermissionsToUser(string userId, IEnumerable<int> permissionIds, string modifiedBy)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -222,15 +246,14 @@ namespace portal_agile.Repositories
                     _context.UserPermissions.RemoveRange(existingPermissions);
 
                     // Add new user permissions
-                    foreach (var permissionId in permissionIds)
+                    var newPermissions = permissionIds.Select(pid => new UserPermission
                     {
-                        _context.UserPermissions.Add(new UserPermission
-                        {
-                            UserId = userId,
-                            PermissionId = permissionId,
-                            CreatedBy = modifiedBy
-                        });
-                    }
+                        UserId = userId,
+                        PermissionId = pid,
+                        CreatedBy = modifiedBy
+                    });
+
+                    _context.UserPermissions.AddRange(newPermissions);
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
@@ -244,6 +267,35 @@ namespace portal_agile.Repositories
             }
         }
 
+        public async Task<bool> AssignPermissionToUser(string userId, int permissionId, string modifiedBy)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return false;
+
+            var permission = await GetPermissionById(permissionId);
+            if (permission == null)
+                return false;
+
+            var existingPermission = await _context.UserPermissions
+                .FirstOrDefaultAsync(up => up.UserId == userId && up.PermissionId == permissionId);
+            if (existingPermission != null)
+                return true;
+
+            var userPermission = new UserPermission
+            {
+                UserId = userId,
+                PermissionId = permissionId,
+                CreatedBy = modifiedBy
+            };
+
+            _context.UserPermissions.Add(userPermission);
+            await _context.SaveChangesAsync();
+            
+            return true;
+        }
+
+        /// <inheritdoc/>
         public async Task<bool> HasPermission(string userId, string permissionCode)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -260,14 +312,7 @@ namespace portal_agile.Repositories
             return userPermissions.Any(p => p.Code == permissionCode);
         }
 
-        public async Task<IList<Claim>> GetUserPermissionClaims(string userId)
-        {
-            var permissions = await GetAllUserPermissions(userId);
-            return permissions
-                .Select(p => new Claim("Permission", p.Code))
-                .ToList();
-        }
-
+        /// <inheritdoc/>
         public async Task RemovePermissionsFromUser(string userId, List<int> permissionIds)
         {
             var user = await _userManager.FindByIdAsync(userId);

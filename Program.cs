@@ -65,9 +65,13 @@ namespace portal_agile
 
             // Register Services
             services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IUserService, UserService>();
 
             // Register Repositories
             services.AddScoped<IPermissionRepository, PermissionRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             // Register authorization handlers
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();

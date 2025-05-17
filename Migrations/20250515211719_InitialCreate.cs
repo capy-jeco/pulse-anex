@@ -48,7 +48,8 @@ namespace portal_agile.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,6 +67,7 @@ namespace portal_agile.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsSystemRole = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     NormalizedName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
@@ -157,7 +159,8 @@ namespace portal_agile.Migrations
                     PermissionId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     CreatedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -331,7 +334,8 @@ namespace portal_agile.Migrations
                     PermissionId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     CreatedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -363,83 +367,83 @@ namespace portal_agile.Migrations
 
             migrationBuilder.InsertData(
                 table: "Permissions",
-                columns: new[] { "PermissionId", "Code", "Description", "IsActive", "Module", "Name" },
+                columns: new[] { "PermissionId", "Code", "Description", "IsActive", "IsDeleted", "Module", "Name" },
                 values: new object[,]
                 {
-                    { 1, "USERS.VIEW", "Can view user list", true, "UserManagement", "View Users" },
-                    { 2, "USERS.CREATE", "Can create new users", true, "UserManagement", "Create Users" },
-                    { 3, "USERS.EDIT", "Can edit existing users", true, "UserManagement", "Edit Users" },
-                    { 4, "USERS.DELETE", "Can delete users", true, "UserManagement", "Delete Users" },
-                    { 5, "ROLES.VIEW", "Can view role list", true, "RoleManagement", "View Roles" },
-                    { 6, "ROLES.CREATE", "Can create new roles", true, "RoleManagement", "Create Roles" },
-                    { 7, "ROLES.EDIT", "Can edit existing roles", true, "RoleManagement", "Edit Roles" },
-                    { 8, "ROLES.DELETE", "Can delete roles", true, "RoleManagement", "Delete Roles" },
-                    { 9, "EMPLOYEES.VIEW", "Can view employee list", true, "EmployeeManagement", "View Employees" },
-                    { 10, "EMPLOYEES.CREATE", "Can create new employees", true, "EmployeeManagement", "Create Employees" },
-                    { 11, "EMPLOYEES.EDIT", "Can edit existing employees", true, "EmployeeManagement", "Edit Employees" },
-                    { 12, "EMPLOYEES.DELETE", "Can delete employees", true, "EmployeeManagement", "Delete Employees" },
-                    { 13, "DEPARTMENTS.VIEW", "Can view department list", true, "DepartmentManagement", "View Departments" },
-                    { 14, "DEPARTMENTS.CREATE", "Can create new departments", true, "DepartmentManagement", "Create Departments" },
-                    { 15, "DEPARTMENTS.EDIT", "Can edit existing departments", true, "DepartmentManagement", "Edit Departments" },
-                    { 16, "DEPARTMENTS.DELETE", "Can delete departments", true, "DepartmentManagement", "Delete Departments" },
-                    { 17, "PERMISSIONS.VIEW", "Can view permission list", true, "PermissionManagement", "View Permissions" },
-                    { 18, "PERMISSIONS.ASSIGN", "Can assign permissions to roles", true, "PermissionManagement", "Assign Permissions" },
-                    { 19, "SYSTEM.SETTINGS", "Can change system settings", true, "SystemAdministration", "System Settings" },
-                    { 20, "SYSTEM.AUDIT", "Can view system audit logs", true, "SystemAdministration", "View Audit Logs" }
+                    { 1, "USERS.VIEW", "Can view user list", true, false, "UserManagement", "View Users" },
+                    { 2, "USERS.CREATE", "Can create new users", true, false, "UserManagement", "Create Users" },
+                    { 3, "USERS.EDIT", "Can edit existing users", true, false, "UserManagement", "Edit Users" },
+                    { 4, "USERS.DELETE", "Can delete users", true, false, "UserManagement", "Delete Users" },
+                    { 5, "ROLES.VIEW", "Can view role list", true, false, "RoleManagement", "View Roles" },
+                    { 6, "ROLES.CREATE", "Can create new roles", true, false, "RoleManagement", "Create Roles" },
+                    { 7, "ROLES.EDIT", "Can edit existing roles", true, false, "RoleManagement", "Edit Roles" },
+                    { 8, "ROLES.DELETE", "Can delete roles", true, false, "RoleManagement", "Delete Roles" },
+                    { 9, "EMPLOYEES.VIEW", "Can view employee list", true, false, "EmployeeManagement", "View Employees" },
+                    { 10, "EMPLOYEES.CREATE", "Can create new employees", true, false, "EmployeeManagement", "Create Employees" },
+                    { 11, "EMPLOYEES.EDIT", "Can edit existing employees", true, false, "EmployeeManagement", "Edit Employees" },
+                    { 12, "EMPLOYEES.DELETE", "Can delete employees", true, false, "EmployeeManagement", "Delete Employees" },
+                    { 13, "DEPARTMENTS.VIEW", "Can view department list", true, false, "DepartmentManagement", "View Departments" },
+                    { 14, "DEPARTMENTS.CREATE", "Can create new departments", true, false, "DepartmentManagement", "Create Departments" },
+                    { 15, "DEPARTMENTS.EDIT", "Can edit existing departments", true, false, "DepartmentManagement", "Edit Departments" },
+                    { 16, "DEPARTMENTS.DELETE", "Can delete departments", true, false, "DepartmentManagement", "Delete Departments" },
+                    { 17, "PERMISSIONS.VIEW", "Can view permission list", true, false, "PermissionManagement", "View Permissions" },
+                    { 18, "PERMISSIONS.ASSIGN", "Can assign permissions to roles", true, false, "PermissionManagement", "Assign Permissions" },
+                    { 19, "SYSTEM.SETTINGS", "Can change system settings", true, false, "SystemAdministration", "System Settings" },
+                    { 20, "SYSTEM.AUDIT", "Can view system audit logs", true, false, "SystemAdministration", "View Audit Logs" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Roles",
-                columns: new[] { "Id", "ConcurrencyStamp", "CreatedDate", "Description", "IsSystemRole", "Name", "NormalizedName" },
+                columns: new[] { "Id", "ConcurrencyStamp", "CreatedDate", "Description", "IsDeleted", "IsSystemRole", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1", null, new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Super Administrator with full access to all system functions", true, "SuperAdmin", "SUPERADMIN" },
-                    { "2", null, new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Administrator with access to most system functions", true, "Admin", "ADMIN" }
+                    { "1", null, new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Super Administrator with full access to all system functions", false, true, "SuperAdmin", "SUPERADMIN" },
+                    { "2", null, new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Administrator with access to most system functions", false, true, "Admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "RolePermissions",
-                columns: new[] { "RolePermissionId", "CreatedBy", "CreatedDate", "PermissionId", "RoleId" },
+                columns: new[] { "RolePermissionId", "CreatedBy", "CreatedDate", "IsDeleted", "PermissionId", "RoleId" },
                 values: new object[,]
                 {
-                    { 1, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "2" },
-                    { 2, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "2" },
-                    { 3, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "2" },
-                    { 4, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 4, "2" },
-                    { 5, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, "2" },
-                    { 6, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 6, "2" },
-                    { 7, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 7, "2" },
-                    { 8, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 8, "2" },
-                    { 9, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 9, "2" },
-                    { 10, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 10, "2" },
-                    { 11, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 11, "2" },
-                    { 12, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 12, "2" },
-                    { 13, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 13, "2" },
-                    { 14, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 14, "2" },
-                    { 15, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 15, "2" },
-                    { 16, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 16, "2" },
-                    { 17, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, "2" },
-                    { 18, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 18, "2" },
-                    { 21, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "1" },
-                    { 22, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "1" },
-                    { 23, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "1" },
-                    { 24, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 4, "1" },
-                    { 25, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, "1" },
-                    { 26, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 6, "1" },
-                    { 27, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 7, "1" },
-                    { 28, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 8, "1" },
-                    { 29, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 9, "1" },
-                    { 30, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 10, "1" },
-                    { 31, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 11, "1" },
-                    { 32, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 12, "1" },
-                    { 33, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 13, "1" },
-                    { 34, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 14, "1" },
-                    { 35, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 15, "1" },
-                    { 36, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 16, "1" },
-                    { 37, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, "1" },
-                    { 38, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 18, "1" },
-                    { 39, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 19, "1" },
-                    { 40, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 20, "1" }
+                    { 1, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, "2" },
+                    { 2, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 2, "2" },
+                    { 3, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 3, "2" },
+                    { 4, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 4, "2" },
+                    { 5, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 5, "2" },
+                    { 6, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 6, "2" },
+                    { 7, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 7, "2" },
+                    { 8, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 8, "2" },
+                    { 9, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 9, "2" },
+                    { 10, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 10, "2" },
+                    { 11, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 11, "2" },
+                    { 12, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 12, "2" },
+                    { 13, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 13, "2" },
+                    { 14, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 14, "2" },
+                    { 15, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 15, "2" },
+                    { 16, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 16, "2" },
+                    { 17, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 17, "2" },
+                    { 18, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 18, "2" },
+                    { 21, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, "1" },
+                    { 22, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 2, "1" },
+                    { 23, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 3, "1" },
+                    { 24, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 4, "1" },
+                    { 25, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 5, "1" },
+                    { 26, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 6, "1" },
+                    { 27, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 7, "1" },
+                    { 28, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 8, "1" },
+                    { 29, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 9, "1" },
+                    { 30, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 10, "1" },
+                    { 31, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 11, "1" },
+                    { 32, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 12, "1" },
+                    { 33, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 13, "1" },
+                    { 34, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 14, "1" },
+                    { 35, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 15, "1" },
+                    { 36, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 16, "1" },
+                    { 37, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 17, "1" },
+                    { 38, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 18, "1" },
+                    { 39, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 19, "1" },
+                    { 40, "System", new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 20, "1" }
                 });
 
             migrationBuilder.CreateIndex(

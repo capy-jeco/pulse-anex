@@ -1,6 +1,6 @@
 ﻿namespace portal_agile.Contracts.Repositories
 {
-    public interface IBaseRepository<T> where T : class
+    public interface IBaseRepository<T, TKey> where T : class
     {
         /// <summary>
         /// Get all entities of type T
@@ -13,7 +13,15 @@
         /// </summary>
         /// <param name="id"></param>
         /// <returns>Type of <typeparamref name="T"/></returns>
-        Task<T?> GetById(T id);
+        Task<T?> GetById(TKey id);
+
+        /// <summary>
+        /// Search for records of type T
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
+        Task<IEnumerable<T>> Search(IQueryable<T> query, string keyword);
 
         /// <summary>
         /// Create record of type T
@@ -32,7 +40,7 @@
         /// Deletes a record of type T
         /// </summary>
         /// <param name="entity"></param>
-        void Delete(T entity);
+        Task<T> SoftDelete(T entity);
 
         /// <summary>
         /// Saves changes to the database

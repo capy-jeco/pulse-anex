@@ -324,6 +324,9 @@ namespace portal_agile.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Module")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -348,6 +351,7 @@ namespace portal_agile.Migrations
                             Code = "USERS.VIEW",
                             Description = "Can view user list",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "UserManagement",
                             Name = "View Users"
                         },
@@ -357,6 +361,7 @@ namespace portal_agile.Migrations
                             Code = "USERS.CREATE",
                             Description = "Can create new users",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "UserManagement",
                             Name = "Create Users"
                         },
@@ -366,6 +371,7 @@ namespace portal_agile.Migrations
                             Code = "USERS.EDIT",
                             Description = "Can edit existing users",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "UserManagement",
                             Name = "Edit Users"
                         },
@@ -375,6 +381,7 @@ namespace portal_agile.Migrations
                             Code = "USERS.DELETE",
                             Description = "Can delete users",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "UserManagement",
                             Name = "Delete Users"
                         },
@@ -384,6 +391,7 @@ namespace portal_agile.Migrations
                             Code = "ROLES.VIEW",
                             Description = "Can view role list",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "RoleManagement",
                             Name = "View Roles"
                         },
@@ -393,6 +401,7 @@ namespace portal_agile.Migrations
                             Code = "ROLES.CREATE",
                             Description = "Can create new roles",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "RoleManagement",
                             Name = "Create Roles"
                         },
@@ -402,6 +411,7 @@ namespace portal_agile.Migrations
                             Code = "ROLES.EDIT",
                             Description = "Can edit existing roles",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "RoleManagement",
                             Name = "Edit Roles"
                         },
@@ -411,6 +421,7 @@ namespace portal_agile.Migrations
                             Code = "ROLES.DELETE",
                             Description = "Can delete roles",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "RoleManagement",
                             Name = "Delete Roles"
                         },
@@ -420,6 +431,7 @@ namespace portal_agile.Migrations
                             Code = "EMPLOYEES.VIEW",
                             Description = "Can view employee list",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "EmployeeManagement",
                             Name = "View Employees"
                         },
@@ -429,6 +441,7 @@ namespace portal_agile.Migrations
                             Code = "EMPLOYEES.CREATE",
                             Description = "Can create new employees",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "EmployeeManagement",
                             Name = "Create Employees"
                         },
@@ -438,6 +451,7 @@ namespace portal_agile.Migrations
                             Code = "EMPLOYEES.EDIT",
                             Description = "Can edit existing employees",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "EmployeeManagement",
                             Name = "Edit Employees"
                         },
@@ -447,6 +461,7 @@ namespace portal_agile.Migrations
                             Code = "EMPLOYEES.DELETE",
                             Description = "Can delete employees",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "EmployeeManagement",
                             Name = "Delete Employees"
                         },
@@ -456,6 +471,7 @@ namespace portal_agile.Migrations
                             Code = "DEPARTMENTS.VIEW",
                             Description = "Can view department list",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "DepartmentManagement",
                             Name = "View Departments"
                         },
@@ -465,6 +481,7 @@ namespace portal_agile.Migrations
                             Code = "DEPARTMENTS.CREATE",
                             Description = "Can create new departments",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "DepartmentManagement",
                             Name = "Create Departments"
                         },
@@ -474,6 +491,7 @@ namespace portal_agile.Migrations
                             Code = "DEPARTMENTS.EDIT",
                             Description = "Can edit existing departments",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "DepartmentManagement",
                             Name = "Edit Departments"
                         },
@@ -483,6 +501,7 @@ namespace portal_agile.Migrations
                             Code = "DEPARTMENTS.DELETE",
                             Description = "Can delete departments",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "DepartmentManagement",
                             Name = "Delete Departments"
                         },
@@ -492,6 +511,7 @@ namespace portal_agile.Migrations
                             Code = "PERMISSIONS.VIEW",
                             Description = "Can view permission list",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "PermissionManagement",
                             Name = "View Permissions"
                         },
@@ -501,6 +521,7 @@ namespace portal_agile.Migrations
                             Code = "PERMISSIONS.ASSIGN",
                             Description = "Can assign permissions to roles",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "PermissionManagement",
                             Name = "Assign Permissions"
                         },
@@ -510,6 +531,7 @@ namespace portal_agile.Migrations
                             Code = "SYSTEM.SETTINGS",
                             Description = "Can change system settings",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "SystemAdministration",
                             Name = "System Settings"
                         },
@@ -519,6 +541,7 @@ namespace portal_agile.Migrations
                             Code = "SYSTEM.AUDIT",
                             Description = "Can view system audit logs",
                             IsActive = true,
+                            IsDeleted = false,
                             Module = "SystemAdministration",
                             Name = "View Audit Logs"
                         });
@@ -540,6 +563,9 @@ namespace portal_agile.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsSystemRole")
                         .HasColumnType("tinyint(1)");
@@ -566,6 +592,7 @@ namespace portal_agile.Migrations
                             Id = "1",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Super Administrator with full access to all system functions",
+                            IsDeleted = false,
                             IsSystemRole = true,
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
@@ -575,6 +602,7 @@ namespace portal_agile.Migrations
                             Id = "2",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Administrator with access to most system functions",
+                            IsDeleted = false,
                             IsSystemRole = true,
                             Name = "Admin",
                             NormalizedName = "ADMIN"
@@ -597,6 +625,9 @@ namespace portal_agile.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int>("PermissionId")
                         .HasColumnType("int");
 
@@ -618,6 +649,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 21,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 1,
                             RoleId = "1"
                         },
@@ -626,6 +658,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 22,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 2,
                             RoleId = "1"
                         },
@@ -634,6 +667,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 23,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 3,
                             RoleId = "1"
                         },
@@ -642,6 +676,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 24,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 4,
                             RoleId = "1"
                         },
@@ -650,6 +685,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 25,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 5,
                             RoleId = "1"
                         },
@@ -658,6 +694,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 26,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 6,
                             RoleId = "1"
                         },
@@ -666,6 +703,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 27,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 7,
                             RoleId = "1"
                         },
@@ -674,6 +712,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 28,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 8,
                             RoleId = "1"
                         },
@@ -682,6 +721,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 29,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 9,
                             RoleId = "1"
                         },
@@ -690,6 +730,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 30,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 10,
                             RoleId = "1"
                         },
@@ -698,6 +739,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 31,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 11,
                             RoleId = "1"
                         },
@@ -706,6 +748,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 32,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 12,
                             RoleId = "1"
                         },
@@ -714,6 +757,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 33,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 13,
                             RoleId = "1"
                         },
@@ -722,6 +766,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 34,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 14,
                             RoleId = "1"
                         },
@@ -730,6 +775,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 35,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 15,
                             RoleId = "1"
                         },
@@ -738,6 +784,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 36,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 16,
                             RoleId = "1"
                         },
@@ -746,6 +793,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 37,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 17,
                             RoleId = "1"
                         },
@@ -754,6 +802,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 38,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 18,
                             RoleId = "1"
                         },
@@ -762,6 +811,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 39,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 19,
                             RoleId = "1"
                         },
@@ -770,6 +820,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 40,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 20,
                             RoleId = "1"
                         },
@@ -778,6 +829,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 1,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 1,
                             RoleId = "2"
                         },
@@ -786,6 +838,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 2,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 2,
                             RoleId = "2"
                         },
@@ -794,6 +847,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 3,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 3,
                             RoleId = "2"
                         },
@@ -802,6 +856,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 4,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 4,
                             RoleId = "2"
                         },
@@ -810,6 +865,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 5,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 5,
                             RoleId = "2"
                         },
@@ -818,6 +874,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 6,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 6,
                             RoleId = "2"
                         },
@@ -826,6 +883,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 7,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 7,
                             RoleId = "2"
                         },
@@ -834,6 +892,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 8,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 8,
                             RoleId = "2"
                         },
@@ -842,6 +901,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 9,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 9,
                             RoleId = "2"
                         },
@@ -850,6 +910,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 10,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 10,
                             RoleId = "2"
                         },
@@ -858,6 +919,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 11,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 11,
                             RoleId = "2"
                         },
@@ -866,6 +928,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 12,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 12,
                             RoleId = "2"
                         },
@@ -874,6 +937,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 13,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 13,
                             RoleId = "2"
                         },
@@ -882,6 +946,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 14,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 14,
                             RoleId = "2"
                         },
@@ -890,6 +955,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 15,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 15,
                             RoleId = "2"
                         },
@@ -898,6 +964,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 16,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 16,
                             RoleId = "2"
                         },
@@ -906,6 +973,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 17,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 17,
                             RoleId = "2"
                         },
@@ -914,6 +982,7 @@ namespace portal_agile.Migrations
                             RolePermissionId = 18,
                             CreatedBy = "System",
                             CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
                             PermissionId = 18,
                             RoleId = "2"
                         });
@@ -934,6 +1003,9 @@ namespace portal_agile.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("PermissionId")
                         .HasColumnType("int");

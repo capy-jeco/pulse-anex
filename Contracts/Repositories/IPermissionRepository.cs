@@ -3,21 +3,8 @@ using portal_agile.Security;
 
 namespace portal_agile.Contracts.Repositories
 {
-    public interface IPermissionRepository
+    public interface IPermissionRepository : IBaseRepository<Permission, int>
     {
-        /// <summary>
-        /// Get all permissions
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<Permission>> GetAllPermissions();
-
-        /// <summary>
-        /// Get permissions by permission id
-        /// </summary>
-        /// <param name="permissionId"></param>
-        /// <returns></returns>
-        Task<Permission> GetPermissionById(int permissionId);
-
         /// <summary>
         /// Get permissions by role id
         /// </summary>
@@ -29,7 +16,7 @@ namespace portal_agile.Contracts.Repositories
         /// Get permissions by module
         /// </summary>
         /// <returns></returns>
-        Task<Dictionary<string, List<Permission>>> GetPermissionsByModule();
+        Task<Dictionary<string, List<Permission>>> GetAllPermissionsByModule();
 
         /// <summary>
         /// Get permissions of role by role id
@@ -53,12 +40,6 @@ namespace portal_agile.Contracts.Repositories
         Task<List<Permission>> GetAllUserPermissions(string userId);
 
         /// <summary>
-        /// Create a new permission
-        /// </summary>
-        /// <returns></returns>
-        Task<Permission> Store(Permission permission);
-
-        /// <summary>
         /// Assign permissions to user
         /// </summary>
         /// <param name="roleId"></param>
@@ -77,12 +58,29 @@ namespace portal_agile.Contracts.Repositories
         Task<bool> AssignDirectPermissionsToUser(string userId, IEnumerable<int> permissionIds, string modifiedBy);
 
         /// <summary>
+        /// Assign a permission to user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="permissionId"></param>
+        /// <param name="modifiedBy"></param>
+        /// <returns></returns>
+        Task<bool> AssignPermissionToUser(string userId, int permissionId, string modifiedBy);
+
+        /// <summary>
         /// Check if user has the specific permission
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="permissionCode"></param>
         /// <returns></returns>
         Task<bool> HasPermission(string userId, string permissionCode);
+
+        /// <summary>
+        /// Remove permissions from user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="permissionIds"></param>
+        /// <returns></returns>
+        Task RemovePermissionsFromUser(string userId, List<int> permissionIds);
 
         /// <summary>
         /// Get user permission claims

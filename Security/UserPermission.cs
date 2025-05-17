@@ -22,6 +22,9 @@ namespace portal_agile.Security
         [Display(Name = "Created By")]
         public required string CreatedBy { get; set; }
 
+        [Display(Name = "Is Deleted")]
+        public bool IsDeleted { get; set; } = false;
+
         // Navigation properties
         [ForeignKey("UserId")]
         public virtual User? User { get; set; }
