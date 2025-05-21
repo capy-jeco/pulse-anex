@@ -32,7 +32,7 @@ namespace portal_agile.Security
         public bool IsDeleted { get; set; } = false;
 
         // Navigation collections
-        public virtual ICollection<RolePermission>? RolePermissions { get; set; }
-        public virtual ICollection<UserPermission>? UserPermissions { get; set; }
+        public virtual ICollection<RolePermission> RolePermissions { get; set; } = [];
+        public virtual ICollection<UserPermission> UserPermissions { get; set; } = [];
     }
 }

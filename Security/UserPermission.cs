@@ -27,9 +27,9 @@ namespace portal_agile.Security
 
         // Navigation properties
         [ForeignKey("UserId")]
-        public virtual User? User { get; set; }
+        public virtual User User { get; set; } = null!;
 
         [ForeignKey("PermissionId")]
-        public virtual Permission? Permission { get; set; }
+        public virtual Permission Permission { get; set; } = null!;
     }
 }

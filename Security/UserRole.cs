@@ -1,18 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using portal_agile.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace portal_agile.Security
 {
-    public class RolePermission
+    public class UserRole
     {
         [Key]
-        public int RolePermissionId { get; set; }
+        public required string UserRoleId { get; set; }
 
-        [Required]
-        public required string RoleId { get; set; }
+        public required string UserId { get; set; } = default!;
 
-        [Required]
-        public int PermissionId { get; set; }
+        public required string RoleId { get; set; } = default!;
 
         [Display(Name = "Created Date")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
@@ -25,10 +25,10 @@ namespace portal_agile.Security
         public bool IsDeleted { get; set; } = false;
 
         // Navigation properties
+        [ForeignKey("UserId")]
+        public virtual User User { get; set; } = null!;
+
         [ForeignKey("RoleId")]
         public virtual Role Role { get; set; } = null!;
-
-        [ForeignKey("PermissionId")]
-        public virtual Permission Permission { get; set; } = null!;
     }
 }

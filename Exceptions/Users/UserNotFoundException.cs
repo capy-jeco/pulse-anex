@@ -14,9 +14,9 @@
         {
         }
 
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
 
-        public UserNotFoundException(int userId) : base($"User with ID {userId} not found.")
+        public UserNotFoundException(Guid userId) : base($"User with ID {userId} not found.")
         {
             UserId = userId;
         }

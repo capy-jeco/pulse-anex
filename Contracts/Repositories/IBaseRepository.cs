@@ -1,4 +1,6 @@
-﻿namespace portal_agile.Contracts.Repositories
+﻿using System.Linq.Expressions;
+
+namespace portal_agile.Contracts.Repositories
 {
     public interface IBaseRepository<T, TKey> where T : class
     {
@@ -35,6 +37,15 @@
         /// </summary>
         /// <param name="entity"></param>
         void Update(T entity);
+
+        /// <summary>
+        /// Updates a specific property of an entity identified by its key
+        /// </summary>
+        /// <param name="id">Primary key of the entity</param>
+        /// <param name="propertyName">Column name or property to update</param>
+        /// <param name="propertyValue">New value for the property</param>
+        /// <returns>The updated entity</returns>
+        Task<T> UpdateFromKey(TKey id, string propertyName, object propertyValue);
 
         /// <summary>
         /// Deletes a record of type T

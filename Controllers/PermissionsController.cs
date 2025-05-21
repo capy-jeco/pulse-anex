@@ -37,7 +37,7 @@ namespace portal_agile.Controllers
         /// <response code="200">Returns the list of permissions</response>
         /// <response code="500">If there was an internal server error</response>
         [HttpGet]
-        [Route("get-all")]
+        [Route("all")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(List<PermissionDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -61,9 +61,10 @@ namespace portal_agile.Controllers
         /// <response code="404">If the permission is not found</response>
         /// <response code="500">If there was an internal server error</response>
         [HttpGet]
-        [Route("get-by-id/{permissionId}")]
+        [Route("{permissionId}")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(PermissionDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPermissionById(int permissionId)
         {
@@ -100,7 +101,7 @@ namespace portal_agile.Controllers
         /// <response code="200">Returns the requested permissions</response>
         /// <response code="500">If there was an internal server error</response>
         [HttpGet]
-        [Route("get-all-by-module")]
+        [Route("all-by-module")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(Dictionary<string, List<PermissionDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -108,153 +109,6 @@ namespace portal_agile.Controllers
         {
             var permissions = await _permissionService.GetAllPermissionsByModuleAsync();
             return Ok(permissions);
-        }
-
-        /// <summary>
-        /// Retrieves all permissions of a role.
-        /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     GET /api/permissions/get-role-permissions
-        ///
-        /// </remarks>
-        /// <returns>All permissions of a role</returns>
-        /// <param name="roleId">The ID of the permission to retrieve.</param>
-        /// <response code="200">Returns the requested permissions</response>
-        /// <response code="404">If the role is not found</response>
-        /// <response code="500">If there was an internal server error</response>
-        [HttpGet]
-        [Route("get-role-permissions")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(List<PermissionDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetRolePermissions([FromBody] string roleId)
-        {
-            try
-            {
-                var permissions = await _permissionService.GetRolePermissionsAsync(roleId);
-                return Ok(permissions);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
-            }
-        }
-
-        /// <summary>
-        /// Retrieves all direct permissions of a user
-        /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     GET /api/permissions/get-user-direct-permissions/{userId}
-        ///
-        /// </remarks>
-        /// <returns>All permissions of a role</returns>
-        /// <param name="userId">The ID of the permission to retrieve.</param>
-        /// <response code="200">Returns the requested permissions</response>
-        /// <response code="404">If the user is not found</response>
-        /// <response code="500">If there was an internal server error</response>
-        [HttpGet]
-        [Route("get-user-direct-permissions")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(List<PermissionDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetUserDirectPermissions([FromBody] string userId)
-        {
-            try
-            {
-                var permissions = await _permissionService.GetUserDirectPermissionsAsync(userId);
-                return Ok(permissions);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
-            }
-        }
-
-        /// <summary>
-        /// Retrieves all permissions of a user
-        /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     GET /api/permissions/get-all-user-permissions/{userId}
-        ///
-        /// </remarks>
-        /// <returns>All permissions of a role</returns>
-        /// <param name="userId">The ID of the permission to retrieve.</param>
-        /// <response code="200">Returns the requested permissions</response>
-        /// <response code="404">If the user is not found</response>
-        /// <response code="500">If there was an internal server error</response>
-        [HttpGet]
-        [Route("get-all-user-permissions")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(List<PermissionDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllUserPermissions([FromBody] string userId)
-        {
-            try
-            {
-                var permissions = await _permissionService.GetAllUserPermissionsAsync(userId);
-                return Ok(permissions);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
-            }
-        }
-
-        /// <summary>
-        /// Retrieves all permission claims of a user
-        /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     GET /api/permissions/get-user-permission-claims/{userId}
-        ///
-        /// </remarks>
-        /// <returns>All permission claims of a user</returns>
-        /// <param name="userId">The ID of the user to retrieve.</param>
-        /// <response code="200">Returns the requested permission claims</response>
-        /// <response code="404">If the user is not found</response>
-        /// <response code="500">If there was an internal server error</response>
-        [HttpGet]
-        [Route("get-user-permission-claims")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(List<PermissionDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetUserPermissionClaims([FromBody] string userId)
-        {
-            try
-            {
-                var claims = await _permissionService.GetUserPermissionClaimsAsync(userId);
-                return Ok(claims);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
-            }
         }
 
         /// <summary>
@@ -373,49 +227,7 @@ namespace portal_agile.Controllers
         }
 
         /// <summary>
-        /// Assign direct permissions to user.
-        /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /api/permissions/assign-direct-permission-to-user
-        ///     {
-        ///        "userId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-        ///        "permissionIds": [1, 2, 3],
-        ///        "modifiedBy": "b1c2d3e4-f5g6-0987-4321-098765hijlkm",
-        ///     }
-        ///
-        /// </remarks>
-        /// <param name="userId">The id of the user to assign the permissions to</param>
-        /// <param name="permissionIds">The ids of the permissions to assign to the user</param>
-        /// <param name="modifiedBy">The id of the user that performed the update</param>
-        /// <returns>No content.</returns>
-        /// <response code="201">No content.</response>
-        /// <response code="400">If the permission data is invalid</response>
-        [HttpPost]
-        [Route("assign-direct-permission-to-user")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AssignDirectPermissionsToUser(string userId, IEnumerable<int> permissionIds, string modifiedBy)
-        {
-            if (string.IsNullOrEmpty(userId))
-                return BadRequest("User ID is required.");
-
-            if (permissionIds == null || !permissionIds.Any())
-                return BadRequest("Permission IDs are required.");
-
-            var success = await _permissionService.AssignDirectPermissionsToUserAsync(userId, permissionIds, modifiedBy);
-
-            if (!success)
-                return BadRequest("Failed to assign permissions to user.");
-
-            return NoContent(); // or Ok(true)
-        }
-
-        /// <summary>
-        /// Assign direct permissions to user.
+        /// Check if user have the permission.
         /// </summary>
         /// <remarks>
         /// Sample request:

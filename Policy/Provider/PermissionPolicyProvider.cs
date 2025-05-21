@@ -10,18 +10,19 @@ namespace portal_agile.Policy.Provider
 
         public Task<AuthorizationPolicy> GetDefaultPolicyAsync() => FallbackPolicyProvider.GetDefaultPolicyAsync();
 
-        public Task<AuthorizationPolicy> GetFallbackPolicyAsync()
+        public Task<AuthorizationPolicy?> GetFallbackPolicyAsync()
         {
-            return FallbackPolicyProvider.GetFallbackPolicyAsync();
+            return FallbackPolicyProvider.GetFallbackPolicyAsync()!;
         }
 
-        public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
+        public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
         {
             // If the policy name doesn't start with "Permission:", use the fallback provider
             if (!policyName.StartsWith("Permission:"))
             {
                 var policyTask = FallbackPolicyProvider.GetPolicyAsync(policyName);
-                return policyTask.ContinueWith(task =>
+                
+                _ = policyTask!.ContinueWith(task =>
                 {
                     if (task.Result == null)
                     {
@@ -39,7 +40,7 @@ namespace portal_agile.Policy.Provider
                 .AddRequirements(new PermissionRequirement(permissionCode))
                 .Build();
 
-            return Task.FromResult(policy);
+            return Task.FromResult(policy)!;
         }
     }
 }

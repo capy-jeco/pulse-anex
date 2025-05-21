@@ -44,7 +44,7 @@ namespace portal_agile.Data
                 .HasForeignKey(e => e.DepartmentId)
                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
 
-            // Configure relationships for Permissions
+            #region Role-Permission Relations
             modelBuilder.Entity<RolePermission>()
                 .HasOne(rp => rp.Role)
                 .WithMany(r => r.RolePermissions)
@@ -56,10 +56,18 @@ namespace portal_agile.Data
                 .WithMany(p => p.RolePermissions)
                 .HasForeignKey(rp => rp.PermissionId)
                 .OnDelete(DeleteBehavior.Cascade);
+            #endregion
+
+            #region User-Permissions Relations
+            modelBuilder.Entity<UserPermission>()
+                .HasOne(up => up.User)
+                .WithMany(u => u.UserPermissions)
+                .HasForeignKey(up => up.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<UserPermission>()
                 .HasOne(up => up.User)
-                .WithMany(u => u.DirectPermissions)
+                .WithMany()
                 .HasForeignKey(up => up.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -68,6 +76,19 @@ namespace portal_agile.Data
                 .WithMany(p => p.UserPermissions)
                 .HasForeignKey(up => up.PermissionId)
                 .OnDelete(DeleteBehavior.Cascade);
+            #endregion
+
+            #region User-Role Relations
+            modelBuilder.Entity<UserRole>()
+                .HasOne(ur => ur.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(ur => ur.RoleId);
+
+            modelBuilder.Entity<UserRole>()
+                .HasOne(ur => ur.User)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(ur => ur.RoleId);
+            #endregion
 
             // Add unique constraints
             modelBuilder.Entity<Employee>()

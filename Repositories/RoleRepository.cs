@@ -18,6 +18,7 @@ namespace portal_agile.Repositories
             _roleManager = roleManager;
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Role>> GetAllRoles()
         {
             var roles = await base.GetAll();
@@ -25,20 +26,33 @@ namespace portal_agile.Repositories
             return roles;
         }
 
-        public async Task<Role> GetRoleById(string roleId)
-        {
-            var role = await base.GetById(roleId);
-
-            return role;
-        }
-
-        public async Task<Role> GetRoleByName(string roleName)
+        /// <inheritdoc/>
+        public async Task<Role?> GetRoleByName(string roleName)
         {
             var roleResult = await base.Search(_dbSet, roleName);
 
             var role = roleResult.Where(r => r.Name == roleName).FirstOrDefault();
 
             return role;
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<Permission>?> GetRolePermissions(string roleId)
+        {
+            var role = await GetById(roleId);
+            if (role == null)
+            {
+                throw new ArgumentException($"Role with ID {roleId} not found.");
+            }
+
+            var permissions = await _context.RolePermissions
+                .Where(rp => rp.RoleId == roleId)
+                .Include(rp => rp.Permission)
+                .Select(rp => rp.Permission)
+                .Where(p => p.IsActive)
+                .ToListAsync();
+
+            return permissions;
         }
     }
 }

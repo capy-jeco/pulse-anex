@@ -28,7 +28,9 @@ namespace portal_agile.Security
         [Display(Name = "IsDeleted")]
         public bool IsDeleted { get; set; } = false;
 
+        public virtual ICollection<UserRole> UserRoles { get; set; } = [];
+
         // Navigation collection for role permissions
-        public virtual ICollection<RolePermission> RolePermissions { get; set; }
+        public virtual ICollection<RolePermission> RolePermissions { get; set; } = [];
     }
 }

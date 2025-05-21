@@ -24,9 +24,15 @@ namespace portal_agile.Models
         public bool IsActive { get; set; } = true;
 
         // Navigation property to Employee if this user is an employee
-        public virtual Employee? Employee { get; set; }
+        public virtual Employee Employee { get; set; } = null!;
+
+        // Navigation collection for user roles
+        public virtual ICollection<UserRole> UserRoles { get; set; } = [];
+
+        // Navigation collection for user permissions
+        public virtual ICollection<UserPermission> UserPermissions { get; set; } = [];
 
         // Navigation collection for user permissions (direct permissions not through roles)
-        public virtual ICollection<UserPermission>? DirectPermissions { get; set; }
+        public virtual IEnumerable<UserPermission> DirectPermissions { get; set; } = [];
     }
 }

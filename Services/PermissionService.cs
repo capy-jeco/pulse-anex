@@ -12,15 +12,18 @@ namespace portal_agile.Services
     public class PermissionService : IPermissionService
     {
         private readonly IPermissionRepository _permissionRepository;
+        private readonly IRoleRepository _roleRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
         public PermissionService(
             IPermissionRepository permissionRepository,
+            IRoleRepository roleRepository,
             IUserRepository userRepository,
             IMapper mapper)
         {
             _permissionRepository = permissionRepository;
+            _roleRepository = roleRepository;
             _userRepository = userRepository;
             _mapper = mapper;
         }
@@ -60,40 +63,8 @@ namespace portal_agile.Services
         /// <inheritdoc/>
         public async Task<List<PermissionDto>> GetRolePermissionsAsync(string roleId)
         {
-            var permissions = await _permissionRepository.GetRolePermissions(roleId);
+            var permissions = await _roleRepository.GetRolePermissions(roleId);
             return _mapper.Map<List<PermissionDto>>(permissions);
-        }
-
-        /// <inheritdoc/>
-        public async Task<List<PermissionDto>> GetUserDirectPermissionsAsync(string userId)
-        {
-            var permissions = await _permissionRepository.GetUserDirectPermissions(userId);
-            return _mapper.Map<List<PermissionDto>>(permissions);
-        }
-
-        /// <inheritdoc/>
-        public async Task<List<PermissionDto>> GetAllUserPermissionsAsync(string userId)
-        {
-            var permissions = await _permissionRepository.GetAllUserPermissions(userId);
-            return _mapper.Map<List<PermissionDto>>(permissions);
-        }
-
-        /// <inheritdoc/>
-        public async Task<IList<Claim>> GetUserPermissionClaimsAsync(string userId)
-        {
-            var user = await _userRepository.GetById(userId);
-            if (user == null)
-            {
-                throw new UserNotFoundException(userId);
-            }
-
-            var permissionClaims = await _permissionRepository.GetUserPermissionClaims(userId);
-            if (permissionClaims == null || !permissionClaims.Any())
-            {
-                return new List<Claim>();
-            }
-
-            return permissionClaims;
         }
 
         /// <inheritdoc/>
@@ -127,51 +98,9 @@ namespace portal_agile.Services
         }
 
         /// <inheritdoc/>
-        public async Task<bool> AssignDirectPermissionsToUserAsync(string userId, IEnumerable<int> permissionIds, string modifiedBy)
-        {
-            var user = await _userRepository.GetById(userId);
-            if (user == null)
-            {
-                throw new UserNotFoundException(userId);
-            }
-            var permissionsAreAssigned = await _permissionRepository.AssignDirectPermissionsToUser(userId, permissionIds, modifiedBy);
-
-            return permissionsAreAssigned;
-        }
-
-        public async Task<bool> AssignPermissionToUserAsync(string userId, int permissionId, string modifiedBy)
-        {
-            var user = await _userRepository.GetById(userId);
-            if (user == null)
-            {
-                throw new UserNotFoundException(userId);
-            }
-
-            var permission = await _permissionRepository.GetById(permissionId);
-            if (permission == null)
-            {
-                throw new Exception("Permission not found");
-            }
-
-            var permissionsAreAssigned = await _permissionRepository.AssignPermissionToUser(userId, permissionId, modifiedBy);
-
-            return permissionsAreAssigned;
-        }
-
-        /// <inheritdoc/>
         public async Task<bool> HasPermissionAsync(string userId, string permissionCode)
         {
             return await _permissionRepository.HasPermission(userId, permissionCode);
-        }
-
-        public async Task RemovePermissionsFromUser(string userId, List<int> permissionIds)
-        {
-            var user = await _userRepository.GetById(userId);
-            if (user == null)
-            {
-                throw new UserNotFoundException(userId);
-            }
-            await _permissionRepository.RemovePermissionsFromUser(userId, permissionIds);
         }
 
         /// <inheritdoc/>

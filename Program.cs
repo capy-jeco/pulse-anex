@@ -4,13 +4,13 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using portal_agile.Authorization.Handlers;
 using portal_agile.Authorization.Requirements;
 using portal_agile.Contracts.Repositories;
 using portal_agile.Contracts.Services;
 using portal_agile.Data;
+using portal_agile.Helpers;
 using portal_agile.Mappings;
 using portal_agile.Models;
 using portal_agile.Policy.Provider;
@@ -76,6 +76,10 @@ namespace portal_agile
             // Register authorization handlers
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
             services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
+            #region Register Helpers
+            services.AddScoped<IInputValidator, InputValidator>();
+            #endregion
 
             // Add permission policies
             services.AddAuthorization(options =>

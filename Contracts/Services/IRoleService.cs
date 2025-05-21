@@ -1,4 +1,5 @@
-﻿using portal_agile.Dtos.Roles;
+﻿using portal_agile.Dtos.Permissions;
+using portal_agile.Dtos.Roles;
 using portal_agile.Security;
 
 namespace portal_agile.Contracts.Services
@@ -6,11 +7,10 @@ namespace portal_agile.Contracts.Services
     public interface IRoleService
     {
         /// <summary>
-        /// Creates a new role
+        /// Gets all roles
         /// </summary>
-        /// <param name="roleCreateDto"></param>
         /// <returns></returns>
-        Task<RoleDto> CreateRoleAsync(RoleCreateDto roleCreateDto);
+        Task<IEnumerable<RoleDto>> GetAllRolesAsync();
 
         /// <summary>
         /// Gets a role by its ID
@@ -20,10 +20,18 @@ namespace portal_agile.Contracts.Services
         Task<RoleDto> GetRoleByIdAsync(string roleId);
 
         /// <summary>
-        /// Gets all roles
+        /// Get permissions of role by role id
         /// </summary>
+        /// <param name="roleId"></param>
         /// <returns></returns>
-        Task<IEnumerable<RoleDto>> GetAllRolesAsync();
+        Task<List<PermissionDto>?> GetRolePermissionsAsync(string roleId);
+
+        /// <summary>
+        /// Creates a new role
+        /// </summary>
+        /// <param name="roleCreateDto"></param>
+        /// <returns></returns>
+        Task<RoleDto> CreateRoleAsync(RoleCreateDto roleCreateDto);
 
         /// <summary>
         /// Updates a role
@@ -31,7 +39,7 @@ namespace portal_agile.Contracts.Services
         /// <param name="roleId"></param>
         /// <param name="roleUpdate"></param>
         /// <returns></returns>
-        Task<RoleDto> UpdateRoleAsync(Role roleUpdate);
+        Task<RoleDto> UpdateRoleAsync(string roleId, RoleDto roleUpdate);
 
         /// <summary>
         /// Soft deletes a role

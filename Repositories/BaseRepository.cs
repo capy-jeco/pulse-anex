@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using portal_agile.Contracts.Repositories;
-using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace portal_agile.Repositories
 {
@@ -13,7 +13,8 @@ namespace portal_agile.Repositories
         protected readonly TContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public BaseRepository(TContext context)
+        public BaseRepository(
+            TContext context)
         {
             _context = context;
             _dbSet = _context.Set<T>();
@@ -86,6 +87,41 @@ namespace portal_agile.Repositories
             _dbSet.Update(entity);
         }
 
+        public async Task<T> UpdateFromKey(TKey id, string propertyName, object propertyValue)
+        {
+            // Find the entity
+            var entity = await GetById(id);
+
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"{nameof(T)} with ID {id} not found");
+            }
+
+            // Get property info
+            var propertyInfo = typeof(T).GetProperty(propertyName);
+            if (propertyInfo == null)
+            {
+                throw new ArgumentException($"Property '{propertyName}' does not exist on type {typeof(T).Name}");
+            }
+
+            // Get old value for auditing
+            var oldValue = propertyInfo.GetValue(entity);
+
+            // Convert the value to the correct type
+            object? typedValue = ConvertValue(propertyValue, propertyInfo.PropertyType);
+
+            // Set the value
+            propertyInfo.SetValue(entity, typedValue);
+
+            // Mark only this property as modified
+            _context.Entry(entity).Property(propertyName).IsModified = true;
+
+            // Save changes
+            await _context.SaveChangesAsync();
+
+            return entity;
+        }
+
         /// <inheritdoc/>
         public virtual Task<T> SoftDelete(T entity)
         {
@@ -101,6 +137,50 @@ namespace portal_agile.Repositories
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        private object? ConvertValue(object value, Type targetType)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (targetType.IsEnum && value is string stringValue)
+            {
+                return Enum.Parse(targetType, stringValue);
+            }
+
+            if (value is JsonElement jsonElement)
+            {
+                // Handle values coming from System.Text.Json
+                return ConvertFromJsonElement(jsonElement, targetType);
+            }
+
+            return Convert.ChangeType(value, targetType);
+        }
+
+        private object? ConvertFromJsonElement(JsonElement element, Type targetType)
+        {
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.String:
+                    return element.GetString();
+                case JsonValueKind.Number:
+                    if (targetType == typeof(int)) return element.GetInt32();
+                    if (targetType == typeof(long)) return element.GetInt64();
+                    if (targetType == typeof(decimal)) return element.GetDecimal();
+                    if (targetType == typeof(double)) return element.GetDouble();
+                    return element.GetDecimal();
+                case JsonValueKind.True:
+                    return true;
+                case JsonValueKind.False:
+                    return false;
+                case JsonValueKind.Null:
+                    return null;
+                default:
+                    return element.GetRawText();
+            }
         }
     }
 }
