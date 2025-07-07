@@ -11,8 +11,9 @@ using portal_agile.Services;
 
 namespace portal_agile.Controllers
 {
-    [Route("api/users")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class UsersController : Controller
     {
         private readonly IUserService _userService;
@@ -471,94 +472,6 @@ namespace portal_agile.Controllers
             {
                 var assigned = await _userService.AssignRoleToUserAsync(userId, roleName);
                 return Ok(assigned);
-            }
-            catch (PermissionNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
-            }
-        }
-
-        /// <summary>
-        /// Assign direct permissions to user.
-        /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /api/users/{userId}/assign-direct-permissions
-        ///     {
-        ///        "userId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-        ///        "permissionIds": [1, 2, 3],
-        ///        "modifiedBy": "b1c2d3e4-f5g6-0987-4321-098765hijlkm",
-        ///     }
-        ///
-        /// </remarks>
-        /// <param name="userId">The id of the user to assign the permissions to</param>
-        /// <param name="permissionIds">The ids of the permissions to assign to the user</param>
-        /// <param name="modifiedBy">The id of the user that performed the update</param>
-        /// <response code="201">No content.</response>
-        /// <response code="400">If the permission data is invalid</response>
-        /// <response code="500">If there was an internal server error</response>
-        [HttpPost]
-        [Route("{userId}/assign-direct-permissions")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AssignDirectPermissionsToUser([FromRoute] string userId, [FromBody] IEnumerable<int> permissionIds, string modifiedBy)
-        {
-            if (string.IsNullOrEmpty(userId))
-                return BadRequest("User ID is required.");
-
-            if (permissionIds == null || !permissionIds.Any())
-                return BadRequest("Permission IDs are required.");
-
-            var success = await _userService.AssignDirectPermissionsToUserAsync(userId, permissionIds, modifiedBy);
-
-            if (!success)
-                return BadRequest("Failed to assign permissions to user.");
-
-            return Ok(success);
-        }
-
-        /// <summary>
-        /// Revoke permissions from user.
-        /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /api/users/{userId}/revoke-permissions
-        ///     {
-        ///        "permissionIds": [1, 2, 3],
-        ///        "modifiedBy": "b1c2d3e4-f5g6-0987-4321-098765hijlkm",
-        ///     }
-        ///
-        /// </remarks>
-        /// <param name="userId">The id of the user to revoke the permissions from</param>
-        /// <param name="request">The request body</param>
-        /// <response code="200">Returns true when permission assignment is successful</response>
-        /// <response code="400">If the user or permission cannot be found</response>
-        /// <response code="500">If there was an internal server error</response>
-        [HttpPost]
-        [Route("{userId}/assign-permission")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> RevokeDirectPermissionsFromUser(
-            [FromRoute] string userId, 
-            [FromBody] RevokePermissionFromUserRequest request)
-        {
-            try
-            {
-                return Ok(await _userService.RevokeDirectPermissionsFromUserAsync(userId, request.PermissionIds, request.ModifiedBy));
-            }
-            catch (UserNotFoundException ex)
-            {
-                return NotFound(ex.Message);
             }
             catch (PermissionNotFoundException ex)
             {

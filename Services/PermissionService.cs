@@ -49,18 +49,6 @@ namespace portal_agile.Services
         }
 
         /// <inheritdoc/>
-        public async Task<Dictionary<string, List<PermissionDto>>> GetAllPermissionsByModuleAsync()
-        {
-            var permissions = await _permissionRepository.GetAllPermissionsByModule();
-            if (permissions == null)
-            {
-                return new Dictionary<string, List<PermissionDto>>();
-            }
-
-            return _mapper.Map<Dictionary<string, List<PermissionDto>>>(permissions);
-        }
-
-        /// <inheritdoc/>
         public async Task<List<PermissionDto>> GetRolePermissionsAsync(string roleId)
         {
             var permissions = await _roleRepository.GetRolePermissions(roleId);
@@ -101,12 +89,6 @@ namespace portal_agile.Services
         public async Task<bool> HasPermissionAsync(string userId, string permissionCode)
         {
             return await _permissionRepository.HasPermission(userId, permissionCode);
-        }
-
-        /// <inheritdoc/>
-        public async Task SeedDefaultPermissionsAsync()
-        {
-            await _permissionRepository.SeedDefaultPermissions();
         }
     }
 }

@@ -56,36 +56,6 @@ namespace portal_agile.Repositories
                 .Select(ur => ur.Role)
                 .ToListAsync();
         }
-        //var removed = await _userManager.RemoveFromRolesAsync(user, roles);
-
-        /// <inheritdoc/>
-        public async Task<IEnumerable<Permission>?> GetDirectPermissionsByUserId(string userId)
-        {
-            var user = await _userManager.Users
-                .Where(u => u.Id == userId)
-                .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Role)
-                        .ThenInclude(r => r.RolePermissions)
-                .Include(u => u.DirectPermissions)
-                    .ThenInclude(dp => dp.Permission)
-                .FirstOrDefaultAsync() ?? throw new UserNotFoundException(userId);
-
-            var rolePermissionIds = user.UserRoles?
-                .Where(ur => ur.Role != null)
-                .SelectMany(ur => ur.Role.RolePermissions)
-                .Select(rp => rp.PermissionId)
-                .ToHashSet() ?? [];
-
-            if (rolePermissionIds == null || rolePermissionIds.Count == 0)
-                return [];
-
-            var directPermissionsNotInRoles = user.DirectPermissions?
-                .Where(dp => !rolePermissionIds.Contains(dp.PermissionId))
-                .Select(dp => dp.Permission)
-                .ToList() ?? [];
-
-            return directPermissionsNotInRoles;
-        }
 
         /// <inheritdoc/>
         public async Task<IEnumerable<Permission>?> GetAllUserPermissionsByUserId(string userId)
@@ -107,14 +77,6 @@ namespace portal_agile.Repositories
                         rolePermissions.AddRange(permissions);
                 }
             }
-
-            // Get user's direct permissions
-            var directPermissions = await GetDirectPermissionsByUserId(userId);
-
-            if (directPermissions?.Count() > 0)
-                _ = rolePermissions
-                    .Union(directPermissions, new PermissionComparer())
-                    .ToList();
 
             return rolePermissions;
         }
@@ -147,104 +109,13 @@ namespace portal_agile.Repositories
             return result.Succeeded;
         }
 
-        /// <inheritdoc/>
-        public async Task<bool> AssignUserDirectPermissions(string userId, IEnumerable<int> permissionIds, string modifiedBy)
+        public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var userByToken = await _context.Users
+                .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken &&
+                                        u.RefreshTokenExpiry > DateTime.UtcNow);
 
-            // Begin transaction
-            using (var transaction = await _context.Database.BeginTransactionAsync())
-            {
-                try
-                {
-                    // Remove existing user permissions
-                    var existingPermissions = await _context.UserPermissions
-                        .Where(up => up.UserId == userId)
-                        .ToListAsync();
-
-                    _context.UserPermissions.RemoveRange(existingPermissions);
-
-                    // Add new user permissions
-                    var newPermissions = permissionIds.Select(pid => new UserPermission
-                    {
-                        UserId = userId,
-                        PermissionId = pid,
-                        CreatedBy = modifiedBy
-                    });
-
-                    _context.UserPermissions.AddRange(newPermissions);
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                    return true;
-                }
-                catch
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
-        }
-
-        public async Task<bool> AssignPermissionToUser(string userId, int permissionId, string modifiedBy)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-
-            var permission = await _context.Permissions.FindAsync(permissionId);
-
-            // Check if permission already exists
-            bool exists = await _context.UserPermissions
-                .AnyAsync(up => up.UserId == userId && up.PermissionId == permissionId);
-
-            if (exists)
-                return true;
-
-            _context.UserPermissions.Add(new UserPermission
-            {
-                UserId = user!.Id,
-                PermissionId = permission!.PermissionId,
-                CreatedBy = modifiedBy,
-                CreatedDate = DateTime.UtcNow
-            });
-
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public async Task<bool> RevokePermissionsFromUser(string userId, IEnumerable<int> permissionIds)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-
-            var userPermissions = await _context.UserPermissions
-                .Where(up => up.UserId == user!.Id && permissionIds.Contains(up.PermissionId))
-                .ToListAsync();
-
-            if (!userPermissions.Any())
-                return true; // Nothing to remove
-
-            _context.UserPermissions.RemoveRange(userPermissions);
-
-            var affectedRows = await _context.SaveChangesAsync();
-
-            return affectedRows > 0;
-        }
-
-        public async Task<bool> RevokeDirectPermissionsFromUser(string userId, IEnumerable<int> permissionIds, string modifiedBy)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-
-            var userPermissions = await _context.UserPermissions
-                .Where(up => up.UserId == user!.Id && permissionIds.Contains(up.PermissionId))
-                .ToListAsync();
-
-            if (userPermissions.Count == 0)
-                return true;
-
-            _context.UserPermissions.RemoveRange(userPermissions);
-
-            return await _context.SaveChangesAsync() > 0;
+            return userByToken;
         }
 
         public async Task<bool> DeactivateUserByUserId(string userId)

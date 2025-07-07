@@ -12,7 +12,7 @@ namespace portal_agile.Authorization.Handlers
             AuthorizationHandlerContext context,
             PermissionRequirement requirement)
         {
-            if (!context.User.Identity.IsAuthenticated)
+            if ((bool)!context.User.Identity?.IsAuthenticated!)
             {
                 return;
             }

@@ -128,6 +128,21 @@ namespace portal_agile.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RoleUser", b =>
+                {
+                    b.Property<string>("RolesId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("UsersId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("RolesId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("RoleUser");
+                });
+
             modelBuilder.Entity("portal_agile.Models.Department", b =>
                 {
                     b.Property<int>("DepartmentId")
@@ -146,29 +161,14 @@ namespace portal_agile.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int");
+
                     b.HasKey("DepartmentId");
 
-                    b.ToTable("Departments", (string)null);
+                    b.HasIndex("TenantId");
 
-                    b.HasData(
-                        new
-                        {
-                            DepartmentId = 1,
-                            Description = "HR Department",
-                            Name = "Human Resources"
-                        },
-                        new
-                        {
-                            DepartmentId = 2,
-                            Description = "IT Department",
-                            Name = "Information Technology"
-                        },
-                        new
-                        {
-                            DepartmentId = 3,
-                            Description = "Finance Department",
-                            Name = "Finance"
-                        });
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("portal_agile.Models.Employee", b =>
@@ -201,6 +201,9 @@ namespace portal_agile.Migrations
                     b.Property<decimal>("Salary")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
@@ -209,15 +212,226 @@ namespace portal_agile.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.HasIndex("EmployeeNumber")
-                        .IsUnique();
-
                     b.HasIndex("ManagerId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
 
+                    b.HasIndex("TenantId", "EmployeeNumber")
+                        .IsUnique();
+
                     b.ToTable("Employees", (string)null);
+                });
+
+            modelBuilder.Entity("portal_agile.Models.MenuItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int>("MenuLevel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ModuleId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RequiredPermission")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Route")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tooltip")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModuleId");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("RequiredPermission");
+
+                    b.ToTable("MenuItems", (string)null);
+                });
+
+            modelBuilder.Entity("portal_agile.Models.MenuItemPermission", b =>
+                {
+                    b.Property<int>("MenuItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("MenuItemId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.ToTable("MenuItemPermission", (string)null);
+                });
+
+            modelBuilder.Entity("portal_agile.Models.Module", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ModuleName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModuleName")
+                        .IsUnique();
+
+                    b.ToTable("Modules", (string)null);
+                });
+
+            modelBuilder.Entity("portal_agile.Models.Tenant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ConnectionString")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsSystem")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Subdomain")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Subdomain")
+                        .IsUnique();
+
+                    b.ToTable("Tenants", (string)null);
+                });
+
+            modelBuilder.Entity("portal_agile.Models.Timesheet", b =>
+                {
+                    b.Property<Guid>("TimesheetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Day")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeIn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("TimeOut")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("WorkDone")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("TimesheetId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("Timesheets", (string)null);
                 });
 
             modelBuilder.Entity("portal_agile.Models.User", b =>
@@ -232,7 +446,7 @@ namespace portal_agile.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Email")
@@ -264,6 +478,9 @@ namespace portal_agile.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("MiddleName")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
@@ -281,8 +498,17 @@ namespace portal_agile.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("RefreshTokenExpiry")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("tinyint(1)");
@@ -300,6 +526,9 @@ namespace portal_agile.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
+                    b.HasIndex("TenantId", "Email")
+                        .IsUnique();
+
                     b.ToTable("Users", (string)null);
                 });
 
@@ -316,8 +545,10 @@ namespace portal_agile.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
 
@@ -326,11 +557,6 @@ namespace portal_agile.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Module")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -343,208 +569,6 @@ namespace portal_agile.Migrations
                         .IsUnique();
 
                     b.ToTable("Permissions", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            PermissionId = 1,
-                            Code = "USERS.VIEW",
-                            Description = "Can view user list",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "UserManagement",
-                            Name = "View Users"
-                        },
-                        new
-                        {
-                            PermissionId = 2,
-                            Code = "USERS.CREATE",
-                            Description = "Can create new users",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "UserManagement",
-                            Name = "Create Users"
-                        },
-                        new
-                        {
-                            PermissionId = 3,
-                            Code = "USERS.EDIT",
-                            Description = "Can edit existing users",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "UserManagement",
-                            Name = "Edit Users"
-                        },
-                        new
-                        {
-                            PermissionId = 4,
-                            Code = "USERS.DELETE",
-                            Description = "Can delete users",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "UserManagement",
-                            Name = "Delete Users"
-                        },
-                        new
-                        {
-                            PermissionId = 5,
-                            Code = "ROLES.VIEW",
-                            Description = "Can view role list",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "RoleManagement",
-                            Name = "View Roles"
-                        },
-                        new
-                        {
-                            PermissionId = 6,
-                            Code = "ROLES.CREATE",
-                            Description = "Can create new roles",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "RoleManagement",
-                            Name = "Create Roles"
-                        },
-                        new
-                        {
-                            PermissionId = 7,
-                            Code = "ROLES.EDIT",
-                            Description = "Can edit existing roles",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "RoleManagement",
-                            Name = "Edit Roles"
-                        },
-                        new
-                        {
-                            PermissionId = 8,
-                            Code = "ROLES.DELETE",
-                            Description = "Can delete roles",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "RoleManagement",
-                            Name = "Delete Roles"
-                        },
-                        new
-                        {
-                            PermissionId = 9,
-                            Code = "EMPLOYEES.VIEW",
-                            Description = "Can view employee list",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "EmployeeManagement",
-                            Name = "View Employees"
-                        },
-                        new
-                        {
-                            PermissionId = 10,
-                            Code = "EMPLOYEES.CREATE",
-                            Description = "Can create new employees",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "EmployeeManagement",
-                            Name = "Create Employees"
-                        },
-                        new
-                        {
-                            PermissionId = 11,
-                            Code = "EMPLOYEES.EDIT",
-                            Description = "Can edit existing employees",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "EmployeeManagement",
-                            Name = "Edit Employees"
-                        },
-                        new
-                        {
-                            PermissionId = 12,
-                            Code = "EMPLOYEES.DELETE",
-                            Description = "Can delete employees",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "EmployeeManagement",
-                            Name = "Delete Employees"
-                        },
-                        new
-                        {
-                            PermissionId = 13,
-                            Code = "DEPARTMENTS.VIEW",
-                            Description = "Can view department list",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "DepartmentManagement",
-                            Name = "View Departments"
-                        },
-                        new
-                        {
-                            PermissionId = 14,
-                            Code = "DEPARTMENTS.CREATE",
-                            Description = "Can create new departments",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "DepartmentManagement",
-                            Name = "Create Departments"
-                        },
-                        new
-                        {
-                            PermissionId = 15,
-                            Code = "DEPARTMENTS.EDIT",
-                            Description = "Can edit existing departments",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "DepartmentManagement",
-                            Name = "Edit Departments"
-                        },
-                        new
-                        {
-                            PermissionId = 16,
-                            Code = "DEPARTMENTS.DELETE",
-                            Description = "Can delete departments",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "DepartmentManagement",
-                            Name = "Delete Departments"
-                        },
-                        new
-                        {
-                            PermissionId = 17,
-                            Code = "PERMISSIONS.VIEW",
-                            Description = "Can view permission list",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "PermissionManagement",
-                            Name = "View Permissions"
-                        },
-                        new
-                        {
-                            PermissionId = 18,
-                            Code = "PERMISSIONS.ASSIGN",
-                            Description = "Can assign permissions to roles",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "PermissionManagement",
-                            Name = "Assign Permissions"
-                        },
-                        new
-                        {
-                            PermissionId = 19,
-                            Code = "SYSTEM.SETTINGS",
-                            Description = "Can change system settings",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "SystemAdministration",
-                            Name = "System Settings"
-                        },
-                        new
-                        {
-                            PermissionId = 20,
-                            Code = "SYSTEM.AUDIT",
-                            Description = "Can view system audit logs",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Module = "SystemAdministration",
-                            Name = "View Audit Logs"
-                        });
                 });
 
             modelBuilder.Entity("portal_agile.Security.Role", b =>
@@ -578,35 +602,19 @@ namespace portal_agile.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("Roles", (string)null);
+                    b.HasIndex("TenantId", "Name")
+                        .IsUnique();
 
-                    b.HasData(
-                        new
-                        {
-                            Id = "1",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Super Administrator with full access to all system functions",
-                            IsDeleted = false,
-                            IsSystemRole = true,
-                            Name = "SuperAdmin",
-                            NormalizedName = "SUPERADMIN"
-                        },
-                        new
-                        {
-                            Id = "2",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Administrator with access to most system functions",
-                            IsDeleted = false,
-                            IsSystemRole = true,
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        });
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("portal_agile.Security.RolePermission", b =>
@@ -639,388 +647,30 @@ namespace portal_agile.Migrations
 
                     b.HasIndex("PermissionId");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("RoleId", "PermissionId");
 
                     b.ToTable("RolePermissions", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            RolePermissionId = 21,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 1,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 22,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 2,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 23,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 3,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 24,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 4,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 25,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 5,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 26,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 6,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 27,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 7,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 28,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 8,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 29,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 9,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 30,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 10,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 31,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 11,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 32,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 12,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 33,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 13,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 34,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 14,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 35,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 15,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 36,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 16,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 37,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 17,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 38,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 18,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 39,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 19,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 40,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 20,
-                            RoleId = "1"
-                        },
-                        new
-                        {
-                            RolePermissionId = 1,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 1,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 2,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 2,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 3,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 3,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 4,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 4,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 5,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 5,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 6,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 6,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 7,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 7,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 8,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 8,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 9,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 9,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 10,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 10,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 11,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 11,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 12,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 12,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 13,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 13,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 14,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 14,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 15,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 15,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 16,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 16,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 17,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 17,
-                            RoleId = "2"
-                        },
-                        new
-                        {
-                            RolePermissionId = 18,
-                            CreatedBy = "System",
-                            CreatedDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            PermissionId = 18,
-                            RoleId = "2"
-                        });
                 });
 
-            modelBuilder.Entity("portal_agile.Security.UserPermission", b =>
+            modelBuilder.Entity("portal_agile.Security.UserRole", b =>
                 {
-                    b.Property<int>("UserPermissionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(255)");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("UserPermissionId"));
+                    b.Property<string>("RoleId")
+                        .HasColumnType("varchar(255)");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<int>("PermissionId")
-                        .HasColumnType("int");
+                    b.HasKey("UserId", "RoleId");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.HasIndex("RoleId");
 
-                    b.HasKey("UserPermissionId");
-
-                    b.HasIndex("PermissionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserPermissions", (string)null);
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1074,6 +724,28 @@ namespace portal_agile.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RoleUser", b =>
+                {
+                    b.HasOne("portal_agile.Security.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RolesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("portal_agile.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("portal_agile.Models.Department", b =>
+                {
+                    b.HasOne("portal_agile.Models.Tenant", null)
+                        .WithMany("Departments")
+                        .HasForeignKey("TenantId");
+                });
+
             modelBuilder.Entity("portal_agile.Models.Employee", b =>
                 {
                     b.HasOne("portal_agile.Models.Department", "Department")
@@ -1087,6 +759,12 @@ namespace portal_agile.Migrations
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("portal_agile.Models.Tenant", "Tenant")
+                        .WithMany("Employees")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("portal_agile.Models.User", "User")
                         .WithOne("Employee")
                         .HasForeignKey("portal_agile.Models.Employee", "UserId")
@@ -1097,7 +775,76 @@ namespace portal_agile.Migrations
 
                     b.Navigation("Manager");
 
+                    b.Navigation("Tenant");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("portal_agile.Models.MenuItem", b =>
+                {
+                    b.HasOne("portal_agile.Models.Module", "Module")
+                        .WithMany("MenuItems")
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("portal_agile.Models.MenuItem", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Module");
+
+                    b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("portal_agile.Models.MenuItemPermission", b =>
+                {
+                    b.HasOne("portal_agile.Models.MenuItem", "MenuItem")
+                        .WithMany("MenuItemPermissions")
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("portal_agile.Security.Permission", "Permission")
+                        .WithMany("MenuItemPermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MenuItem");
+
+                    b.Navigation("Permission");
+                });
+
+            modelBuilder.Entity("portal_agile.Models.Timesheet", b =>
+                {
+                    b.HasOne("portal_agile.Models.Employee", "Employee")
+                        .WithMany("Timesheets")
+                        .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("portal_agile.Models.User", b =>
+                {
+                    b.HasOne("portal_agile.Models.Tenant", "Tenant")
+                        .WithMany("Users")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("portal_agile.Security.Role", b =>
+                {
+                    b.HasOne("portal_agile.Models.Tenant", "Tenant")
+                        .WithMany("Roles")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("portal_agile.Security.RolePermission", b =>
@@ -1119,21 +866,20 @@ namespace portal_agile.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("portal_agile.Security.UserPermission", b =>
+            modelBuilder.Entity("portal_agile.Security.UserRole", b =>
                 {
-                    b.HasOne("portal_agile.Security.Permission", "Permission")
-                        .WithMany("UserPermissions")
-                        .HasForeignKey("PermissionId")
+                    b.HasOne("portal_agile.Security.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("portal_agile.Models.User", "User")
-                        .WithMany("DirectPermissions")
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Navigation("Permission");
+                    b.Navigation("Role");
 
                     b.Navigation("User");
                 });
@@ -1146,25 +892,53 @@ namespace portal_agile.Migrations
             modelBuilder.Entity("portal_agile.Models.Employee", b =>
                 {
                     b.Navigation("DirectReports");
+
+                    b.Navigation("Timesheets");
+                });
+
+            modelBuilder.Entity("portal_agile.Models.MenuItem", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("MenuItemPermissions");
+                });
+
+            modelBuilder.Entity("portal_agile.Models.Module", b =>
+                {
+                    b.Navigation("MenuItems");
+                });
+
+            modelBuilder.Entity("portal_agile.Models.Tenant", b =>
+                {
+                    b.Navigation("Departments");
+
+                    b.Navigation("Employees");
+
+                    b.Navigation("Roles");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("portal_agile.Models.User", b =>
                 {
-                    b.Navigation("DirectPermissions");
+                    b.Navigation("Employee")
+                        .IsRequired();
 
-                    b.Navigation("Employee");
+                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("portal_agile.Security.Permission", b =>
                 {
-                    b.Navigation("RolePermissions");
+                    b.Navigation("MenuItemPermissions");
 
-                    b.Navigation("UserPermissions");
+                    b.Navigation("RolePermissions");
                 });
 
             modelBuilder.Entity("portal_agile.Security.Role", b =>
                 {
                     b.Navigation("RolePermissions");
+
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

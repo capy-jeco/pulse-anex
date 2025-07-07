@@ -20,12 +20,6 @@ namespace portal_agile.Contracts.Services
         Task<PermissionDto> GetPermissionByIdAsync(int permissionId);
 
         /// <summary>
-        /// Get all permisions of a module
-        /// </summary>
-        /// <returns></returns>
-        Task<Dictionary<string, List<PermissionDto>>> GetAllPermissionsByModuleAsync();
-
-        /// <summary>
         /// Get permissions of a role by role id
         /// </summary>
         /// <param name="roleId"></param>
@@ -62,11 +56,5 @@ namespace portal_agile.Contracts.Services
         /// <param name="permissionCode"></param>
         /// <returns></returns>
         Task<bool> HasPermissionAsync(string userId, string permissionCode);
-
-        /// <summary>
-        /// Seed default permissions
-        /// </summary>
-        /// <returns></returns>
-        Task SeedDefaultPermissionsAsync();
     }
 }

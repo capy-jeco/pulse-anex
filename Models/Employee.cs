@@ -8,6 +8,8 @@ namespace portal_agile.Models
         [Key]
         public int EmployeeId { get; set; }
 
+        public int TenantId { get; set; }
+
         // Foreign key relationship with User
         public required string UserId { get; set; }
 
@@ -41,10 +43,15 @@ namespace portal_agile.Models
         [Display(Name = "Manager")]
         public int? ManagerId { get; set; }
 
+        [ForeignKey("TenantId")]
+        public virtual Tenant Tenant { get; set; } = null!;
+
         [ForeignKey("ManagerId")]
         public virtual Employee? Manager { get; set; }
 
         // Navigation collection for direct reports
         public virtual ICollection<Employee>? DirectReports { get; set; }
+
+        public virtual ICollection<Timesheet> Timesheets { get; set; } = new List<Timesheet>();
     }
 }

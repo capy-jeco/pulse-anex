@@ -89,29 +89,6 @@ namespace portal_agile.Controllers
         }
 
         /// <summary>
-        /// Retrieves all permissions grouped by module.
-        /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     GET /api/permissions/get-all-by-module
-        ///
-        /// </remarks>
-        /// <returns>All permissions grouped by module</returns>
-        /// <response code="200">Returns the requested permissions</response>
-        /// <response code="500">If there was an internal server error</response>
-        [HttpGet]
-        [Route("all-by-module")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(Dictionary<string, List<PermissionDto>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetPermissionsByModule()
-        {
-            var permissions = await _permissionService.GetAllPermissionsByModuleAsync();
-            return Ok(permissions);
-        }
-
-        /// <summary>
         /// Creates a new permission.
         /// </summary>
         /// <remarks>
