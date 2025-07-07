@@ -7,19 +7,12 @@ namespace portal_agile.Security
 {
     public class UserRole
     {
-        [Key]
-        public required string UserRoleId { get; set; }
+        public required string UserId { get; set; }
 
-        public required string UserId { get; set; } = default!;
-
-        public required string RoleId { get; set; } = default!;
+        public required string RoleId { get; set; }
 
         [Display(Name = "Created Date")]
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-
-        [StringLength(100)]
-        [Display(Name = "Created By")]
-        public required string CreatedBy { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Display(Name = "Is Deleted")]
         public bool IsDeleted { get; set; } = false;

@@ -1,4 +1,4 @@
-@portal_agile_HostAddress = http://localhost:5054
+@portal_agile_HostAddress = http://pulse.anex.com
 
 GET {{portal_agile_HostAddress}}/weatherforecast/
 Accept: application/json

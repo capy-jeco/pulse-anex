@@ -8,7 +8,7 @@
 
         public required string Code { get; set; }
 
-        public required string Module { get; set; }
+        public required string ModuleName { get; set; }
 
         public required string Description { get; set; }
     }

@@ -11,7 +11,7 @@ namespace portal_agile.Dtos.Permissions
             // Initialize with default values
             Name = string.Empty;
             Code = string.Empty;
-            Module = string.Empty;
+            ModuleName = string.Empty;
             Description = string.Empty;
         }
     }

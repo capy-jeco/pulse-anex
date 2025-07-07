@@ -67,6 +67,13 @@ namespace portal_agile.Contracts.Services
         Task<IEnumerable<PermissionDto>> GetAllUserPermissionsAsync(string userId);
 
         /// <summary>
+        /// Get all permissions of a user by user id
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>A list of permissions as string</returns>
+        Task<List<string>> GetAllUserPermissionsInStringAsync(string userId);
+
+        /// <summary>
         /// Get user permission claims
         /// </summary>
         /// <param name="userId"></param>
@@ -96,33 +103,6 @@ namespace portal_agile.Contracts.Services
         /// <param name="roleName"></param>
         /// <returns></returns>
         Task<bool> AssignRoleToUserAsync(string userId, string roleName);
-
-        /// <summary>
-        /// Assign direct permissions to user
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permissionIds"></param>
-        /// <param name="modifiedBy"></param>
-        /// <returns></returns>
-        Task<bool> AssignDirectPermissionsToUserAsync(string userId, IEnumerable<int> permissionIds, string modifiedBy);
-
-        /// <summary>
-        /// Assign a permission to user
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permissionId"></param>
-        /// <param name="modifiedBy"></param>
-        /// <returns></returns>
-        Task<bool> AssignPermissionToUserAsync(string userId, int permissionId, string modifiedBy);
-
-        /// <summary>
-        /// Remove permissions from user
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permissionIds"></param>
-        /// <param name="modifiedBy"></param>
-        /// <returns>Updated list of direct permissions assigned</returns>
-        Task<IEnumerable<PermissionDto>> RevokeDirectPermissionsFromUserAsync(string userId, IEnumerable<int> permissionIds, string modifiedBy);
 
         /// <summary>
         /// Deactiviate user

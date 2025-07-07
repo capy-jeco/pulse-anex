@@ -19,8 +19,6 @@ namespace portal_agile.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IRoleRepository _roleRepository;
-        private readonly IPermissionRepository _permissionRepository;
         private readonly IMapper _mapper;
 
         private readonly IInputValidator _inputValidator;
@@ -29,16 +27,12 @@ namespace portal_agile.Services
 
         public UserService(
             IUserRepository userRepository,
-            IRoleRepository roleRepository,
-            IPermissionRepository permissionRepository,
             IMapper mapper,
             IInputValidator inputValidator,
             UserManager<User> userManager,
             RoleManager<Role> roleManager)
         {
             _userRepository = userRepository;
-            _roleRepository = roleRepository;
-            _permissionRepository = permissionRepository;
             _mapper = mapper;
             _inputValidator = inputValidator;
             _roleManager = roleManager;
@@ -131,6 +125,16 @@ namespace portal_agile.Services
             return _mapper.Map<List<PermissionDto>>(permissions);
         }
 
+        public async Task<List<string>> GetAllUserPermissionsInStringAsync(string userId)
+        {
+            if (!_inputValidator.IsValidGuid(userId, out var normalizedGuid))
+            {
+                throw new InvalidUserIdException("User ID is not valid");
+            }
+            var permissions = await _userRepository.GetAllUserPermissionsByUserId(userId);
+            return permissions!.Select(p => p.Name).ToList();
+        }
+
         /// <inheritdoc/>
         public async Task<IList<Claim>> GetUserPermissionClaimsAsync(string userId)
         {
@@ -192,68 +196,6 @@ namespace portal_agile.Services
 
             return await _userRepository.AssignRoleToUserByRoleName(userId, roleName);
         }
-
-        public async Task<bool> AssignDirectPermissionsToUserAsync(string userId, IEnumerable<int> permissionIds, string modifiedBy)
-        {
-            if (!_inputValidator.IsValidGuid(userId, out var normalizedGuid))
-            {
-                throw new InvalidUserIdException("User ID is not valid");
-            }
-
-            var user = await _userRepository.GetById(userId)
-                ?? throw new UserNotFoundException(userId);
-
-            var permissionsAreAssigned = await _userRepository.AssignUserDirectPermissions(userId, permissionIds, modifiedBy);
-
-            return permissionsAreAssigned;
-        }
-
-        public async Task<bool> AssignPermissionToUserAsync(string userId, int permissionId, string modifiedBy)
-        {
-            if (!_inputValidator.IsValidGuid(userId, out var normalizedGuid))
-            {
-                throw new InvalidUserIdException("User ID is not valid");
-            }
-
-            var user = await _userRepository.GetById(userId);
-            if (user == null)
-            {
-                throw new UserNotFoundException(userId);
-            }
-
-            var permission = await _permissionRepository.GetById(permissionId);
-            if (permission == null)
-            {
-                throw new Exception("Permission not found");
-            }
-
-            var permissionsAreAssigned = await _userRepository.AssignPermissionToUser(userId, permissionId, modifiedBy);
-
-            return permissionsAreAssigned;
-        }
-
-        public async Task<IEnumerable<PermissionDto>> RevokeDirectPermissionsFromUserAsync(string userId, IEnumerable<int> permissionIds, string modifiedBy)
-        {
-            IEnumerable<PermissionDto> updatedPermissions = [];
-
-            if (!_inputValidator.IsValidGuid(userId, out var normalizedGuid))
-            {
-                throw new InvalidUserIdException("User ID is not valid");
-            }
-
-            var user = await _userRepository.GetById(userId)
-                ?? throw new UserNotFoundException(userId);
-
-            var result = await _userRepository.RevokeDirectPermissionsFromUser(userId, permissionIds, modifiedBy);
-
-            if (result)
-            {
-                updatedPermissions = _mapper.Map<IEnumerable<PermissionDto>>(await _userRepository.GetAllUserPermissionsByUserId(userId));
-            }
-
-            return updatedPermissions;
-        }
-
 
         /// <inheritdoc/>
         public async Task<bool> DeactivateUserAsync(string userId)

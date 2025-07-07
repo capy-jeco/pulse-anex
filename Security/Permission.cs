@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using portal_agile.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace portal_agile.Security
 {
     public class Permission
     {
         [Key]
-        public int PermissionId { get; set; }
+        public int PermissionId { get; set; } = 0;
 
         [Required]
         [StringLength(100)]
@@ -17,13 +18,9 @@ namespace portal_agile.Security
         [Display(Name = "Permission Code")]
         public required string Code { get; set; }
 
-        [Display(Name = "Module")]
-        [StringLength(100)]
-        public required string Module { get; set; }
-
         [StringLength(500)]
         [Display(Name = "Description")]
-        public required string Description { get; set; }
+        public string? Description { get; set; }
 
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; } = true;
@@ -31,8 +28,13 @@ namespace portal_agile.Security
         [Display(Name = "Is Deleted")]
         public bool IsDeleted { get; set; } = false;
 
+        [Display(Name = "Created Date")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
         // Navigation collections
+
         public virtual ICollection<RolePermission> RolePermissions { get; set; } = [];
-        public virtual ICollection<UserPermission> UserPermissions { get; set; } = [];
+
+        public virtual ICollection<MenuItemPermission> MenuItemPermissions { get; set; } = [];
     }
 }

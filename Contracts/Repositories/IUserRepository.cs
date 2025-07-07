@@ -38,13 +38,6 @@ namespace portal_agile.Contracts.Repositories
         Task<IEnumerable<Role>?> GetRolesByUserId(string userId);
 
         /// <summary>
-        /// Get direct permissions of a user by user id
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<Permission>?> GetDirectPermissionsByUserId(string userId);
-
-        /// <summary>
         /// Get all permissions of a user by user id
         /// </summary>
         /// <param name="userId"></param>
@@ -59,39 +52,19 @@ namespace portal_agile.Contracts.Repositories
         Task<IList<Claim>> GetUserPermissionClaimsByUserId(string userId);
 
         /// <summary>
+        /// Get user by refresh token
+        /// </summary>
+        /// <param name="refreshToken"></param>
+        /// <returns>A user</returns>
+        Task<User?> GetByRefreshTokenAsync(string refreshToken);
+
+        /// <summary>
         /// Assign a role to user
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="roleName"></param>
         /// <returns></returns>
         Task<bool> AssignRoleToUserByRoleName(string userId, string roleName);
-
-        /// <summary>
-        /// Assign direct permissions to user
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permissionIds"></param>
-        /// <param name="modifiedBy"></param>
-        /// <returns></returns>
-        Task<bool> AssignUserDirectPermissions(string userId, IEnumerable<int> permissionIds, string modifiedBy);
-
-        /// <summary>
-        /// Assign a permission to user
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permissionId"></param>
-        /// <param name="modifiedBy"></param>
-        /// <returns></returns>
-        Task<bool> AssignPermissionToUser(string userId, int permissionId, string modifiedBy);
-
-        /// <summary>
-        /// Revoke permissions from user
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permissionIds"></param>
-        /// <param name="modifiedBy"></param>
-        /// <returns></returns>
-        Task<bool> RevokeDirectPermissionsFromUser(string userId, IEnumerable<int> permissionIds, string modifiedBy);
 
         /// <summary>
         /// Deactiviate user

@@ -1,5 +1,6 @@
-﻿using System.Security.Claims;
+﻿using portal_agile.Dtos.Modules;
 using portal_agile.Security;
+using System.Security.Claims;
 
 namespace portal_agile.Contracts.Repositories
 {
@@ -13,10 +14,11 @@ namespace portal_agile.Contracts.Repositories
         Task<IEnumerable<Permission>> GetPermissionsByRoleId(string roleId);
 
         /// <summary>
-        /// Get permissions by module
+        /// Get permissions by roles
         /// </summary>
-        /// <returns></returns>
-        Task<Dictionary<string, List<Permission>>> GetAllPermissionsByModule();
+        /// <param name="roles"></param>
+        /// <returns>List of Permission</returns>
+        Task<List<Permission>> GetPermissionsByRolesAsync(IList<string> roles);
 
         /// <summary>
         /// Assign permissions to user
@@ -34,11 +36,5 @@ namespace portal_agile.Contracts.Repositories
         /// <param name="permissionCode"></param>
         /// <returns></returns>
         Task<bool> HasPermission(string userId, string permissionCode);
-
-        /// <summary>
-        /// Seed default permissions
-        /// </summary>
-        /// <returns></returns>
-        Task SeedDefaultPermissions();
     }
 }
